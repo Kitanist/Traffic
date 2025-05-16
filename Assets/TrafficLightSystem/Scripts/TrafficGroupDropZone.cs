@@ -6,12 +6,20 @@ public class TrafficGroupDropZone : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         var incoming = eventData.pointerDrag?.transform;
-        if (incoming == null) return;
+        if (incoming == null)
+        {
 
+            return;
+        }
+        var slot = incoming.GetComponent<TrafficGroupSlot>();
+        if (slot == null)
+        {
+            return;
+        }
         // Eðer bu dropzone’da zaten bir çocuk varsa, onunla yer deðiþtir
         if (transform.childCount > 0 && transform != incoming.GetComponent<TrafficGroupSlot>().originalParent)
         {
-            Debug.LogError("Hoop çocuk var zaten birader");
+            Debug.LogError("Hoop çocuk var zaten birader istersen babalarý deðiþelim");
             var existing = transform.GetChild(0);
 
             // Mevcut çocuðun parent'ýný al
@@ -27,6 +35,7 @@ public class TrafficGroupDropZone : MonoBehaviour, IDropHandler
         // Yeni child'ý yerleþtir
         incoming.SetParent(transform);
         incoming.localPosition = Vector3.zero;
-        incoming.GetComponent<TrafficGroupSlot>().originalParent = transform;
+        slot.originalParent = transform;
+        slot.MarkAsDropped();
     }
 }

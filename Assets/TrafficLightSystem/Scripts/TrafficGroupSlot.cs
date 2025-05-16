@@ -9,8 +9,9 @@ public class TrafficGroupSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     public TextMeshProUGUI label;
 
     public Transform originalParent;
-    
-    private int originalIndex;
+    private Vector3 originalPosition;
+
+    private bool droppedOnValidZone = false;
 
     public void Setup(TrafficLightGroup group)
     {
@@ -21,8 +22,12 @@ public class TrafficGroupSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent;
-        
+        originalPosition = transform.position;
+
         GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+        // Flag'i resetle
+        droppedOnValidZone = false;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -32,8 +37,18 @@ public class TrafficGroupSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
     public void OnEndDrag(PointerEventData eventData)
     {
-      
-        
         GetComponent<CanvasGroup>().blocksRaycasts = true;
+
+        if (!droppedOnValidZone)
+        {
+            // Geri dön
+            transform.SetParent(originalParent);
+            transform.position = originalPosition;
+        }
+    }
+
+    public void MarkAsDropped()
+    {
+        droppedOnValidZone = true;
     }
 }

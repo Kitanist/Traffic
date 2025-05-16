@@ -53,13 +53,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RedLight: {fileID: 3072569370865069443}
   GreenLight: {fileID: 5111547721640370458}
-  targetLight: {fileID: 0}
+  _targetLight: {fileID: 0}
   TLUI: {fileID: 0}
   YayaState: 2
   YayaStateDropdown: {fileID: 0}
   YayaBindingTypeDropdown: {fileID: 0}
   BindingType: 1
-  CurrentSelected: {fileID: 0}
+  CurrentSelected: {fileID: 5426279162152440198}
+  OriginalColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &7293237830954029279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,7 +172,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2767712954359283519}
   m_LocalRotation: {x: -0.4822479, y: -0.517111, z: -0.48166576, w: 0.5177174}
-  m_LocalPosition: {x: 0, y: 0, z: 3.94}
+  m_LocalPosition: {x: 0, y: 0, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -430,7 +431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &9051233455552877144
 RectTransform:
   m_ObjectHideFlags: 0

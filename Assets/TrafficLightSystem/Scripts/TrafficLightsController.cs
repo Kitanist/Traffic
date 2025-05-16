@@ -44,7 +44,13 @@ public class TrafficLightsController : MonoBehaviour
         TrafficUIManager.GetComponent<TrafficLightUI>().TargetLight = this;
         TrafficUIManager.GetComponent<TrafficLightUI>().OpenUI();// Burda foreach olmalı ve o foreach tum ıntersectionları gezmeli
         TrafficUIManager.GetComponent<TrafficLightUI>().CloseYayaUI();
-
+        TrafficSystemManager.Instance.RefreshReferences();
+        foreach (var light in TrafficSystemManager.Instance.AllTrafficLights)
+        {
+            light.CurrentSelected.color = light.OriginalColor;
+            light.RedCircleClose();
+        }
+        CurrentSelected.color = MyBlue;
         if (!TrafficUIManager.GetComponent<TrafficLightUI>().intersectionController)
         {
             TrafficUIManager.GetComponent<TrafficLightUI>().RemoveFromGroup.interactable = false;

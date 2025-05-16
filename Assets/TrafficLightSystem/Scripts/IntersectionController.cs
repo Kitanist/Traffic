@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
 
 public class IntersectionController : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class IntersectionController : MonoBehaviour
     [Header("Intersection Mode")]
     public IntersectionMode mode;
     public GameObject CurrentSelected;
+    public TMP_Dropdown GroupLights; 
 
     [Header("Custom Order (Used only if mode = Custom)")]
     public List<TrafficLightGroup> customOrder = new List<TrafficLightGroup>();
@@ -151,6 +153,33 @@ public class IntersectionController : MonoBehaviour
         TrafficUIManager.GetComponent<TrafficLightUI>().SetupGroupDropdown();
         CurrentSelected.SetActive(true);
        // Debug.Log("Selected");
+    }
+    public void SetupDropdown(int index)
+    {
+        GroupLights.ClearOptions();
+        var selectedGroup = groups[index];
+        List<string> options = new List<string>();
+
+        
+            foreach (var light in selectedGroup.lights)
+            {
+                options.Add(light.name);
+
+           }
+        
+
+        GroupLights.AddOptions(options);
+    }
+
+   public void OnDropdownValueChanged(int index)
+    {
+        if (index < 0 || index >= groups.Count) return;
+
+        TrafficLightGroup selectedGroup = groups[index];
+
+        // Buraya seçilen gruba göre ne yapmak istiyorsan yaz
+        Debug.Log("Seçilen grup: " + selectedGroup.groupName);
+        Debug.Log("Bu gruptaki ışık sayısı: " + selectedGroup.lights.Count);
     }
 }
 [System.Serializable]

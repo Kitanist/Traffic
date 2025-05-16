@@ -54,9 +54,10 @@ public class BuildManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 GameObject a = Instantiate(currentPrefabToPlace, hit.point, ghostRotation);
+                
                 if (currentPrefabToPlace == buildPrefabs[1])
                 {
-                  //  Debug.Log("Intersection eklendi: " + a.name);
+                  
                     if (!TGUIManager.Intersections.Contains(a))
                     {
                         TGUIManager.Intersections.Add(a);
@@ -71,8 +72,9 @@ public class BuildManager : MonoBehaviour
                 }
                 else
                 {
+                    a.transform.GetChild(0).name = Random.Range(10000,100000).ToString();
                     OnLightPlaced.Raise();
-                    //Debug.LogError("OnLightPlaced");
+                    
 
                 }
                 CancelPlacement();

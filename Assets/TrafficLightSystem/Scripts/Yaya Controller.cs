@@ -3,22 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
-
+using UnityEngine.UI;
 public class YayaController : MonoBehaviour
 {
     public GameObject RedLight, GreenLight;
-    public TrafficLightsController targetLight;
+    public TrafficLightsController _targetLight;
+    public TrafficLightsController targetLight
+    {
+        get
+        {
+            return _targetLight;
+        }
+        set 
+        {
+
+            _targetLight = value;
+
+            
+        }
+    }
+    public IEnumerator RemoveDebugText()
+    {
+        yield return new WaitForSeconds(3);
+        TLUI.RemoveDebugText();
+    }
     public TrafficLightUI TLUI;
     public YayaState YayaState;
     public TMP_Dropdown YayaStateDropdown, YayaBindingTypeDropdown;
     public YayaBindingType BindingType = YayaBindingType.Sync;
-    public GameObject CurrentSelected;
+    public Image CurrentSelected;
+    public Color OriginalColor;
 
     private Coroutine flashingCoroutine;
 
     private void Start()
-    { 
-        
+    {
+        OriginalColor = CurrentSelected.color;
         //YayaStateDropdown.onValueChanged.AddListener(SetState);
         TLUI = FindObjectOfType<TrafficLightUI>();
         
@@ -41,12 +61,16 @@ public class YayaController : MonoBehaviour
     {
         if (IsTargetNull())
         {
-            Debug.Log("Target Null");
+            targetLight = TLUI.TargetLight;
+            if (!targetLight.YayaLights.Contains(this))
+                targetLight.YayaLights.Add(this);
+            CurrentSelected.color = OriginalColor;
+            Debug.Log("Target Nulldu artýk deðil");
             return;
         }
         else
         {
-            Debug.Log("Target Null deðil");
+            Debug.Log("Target Null deðildi hala deðil");
 
             if (targetLight.YayaLights.Contains(this))
                 targetLight.YayaLights.Remove(this);
@@ -55,13 +79,18 @@ public class YayaController : MonoBehaviour
 
             if (!targetLight.YayaLights.Contains(this))
                 targetLight.YayaLights.Add(this);
-
+            CurrentSelected.color = OriginalColor;  
           //  Debug.Log("SetTargetEdited");
         }
 
         // Yeni hedef ýþýk seçildiðinde dropdown'ý güncelle
+        ChangeState();
         UpdateDropdown();
         RefreshAllLightStates();
+    }
+    public void OnTargetDestroyed()
+    {
+        CurrentSelected.color = new Color(r: 160, g: 32, b: 240);
     }
     private void RefreshAllLightStates()
     {
@@ -90,11 +119,19 @@ public class YayaController : MonoBehaviour
             if (YayaStateDropdown != null)
             {
                 Debug.Log($"Yaya Dropdown guncellendi. Deðer önceki {YayaStateDropdown.value}");
-                YayaStateDropdown.value = (int)TLUI.TargetYaya.YayaState;
-                YayaStateDropdown.RefreshShownValue();
-                Debug.Log($"Yaya Dropdown guncellendi. Deðer sonraki {YayaStateDropdown.value}");
+                if (YayaStateDropdown.value != (int)TLUI.TargetYaya.YayaState)
+                {
+                    YayaStateDropdown.value = (int)TLUI.TargetYaya.YayaState;
+                    YayaStateDropdown.RefreshShownValue();
+                    TLUI.TargetYaya.SetState((int)TLUI.TargetYaya.YayaState);
+                    Debug.Log($"Yaya Dropdown guncellendi. Deðer sonraki {YayaStateDropdown.value}");
+                }
+                 else 
+                    Debug.Log($"Yaya Dropdown guncellenmedi deðer ayný");
+               
 
-                TLUI.TargetYaya.SetState((int)TLUI.TargetYaya.YayaState);
+
+                   
             }
 
             // YayaBindingType güncelleme
@@ -133,6 +170,7 @@ public class YayaController : MonoBehaviour
             case YayaBindingType.Sync:
                 if (flashingCoroutine != null)
                     StopCoroutine(flashingCoroutine);
+                Debug.Log("Selected");
                 RedLight.SetActive(false);
                 GreenLight.SetActive(false);
                 if (!IsNight)
@@ -227,6 +265,8 @@ public class YayaController : MonoBehaviour
                     StopCoroutine(flashingCoroutine);
                 RedLight.SetActive(false);
                 GreenLight.SetActive(false);
+                Debug.Log("Selected");
+
                 if (!IsNight)
                 {
                     if (targetLight.CurrentState == TrafficLightState.Green) // IsAuto için ayrýca bakýver
@@ -432,7 +472,22 @@ public class YayaController : MonoBehaviour
             });
             UpdateDropdown();
         }
-      //  CurrentSelected.SetActive(true);
+        var AllTrafficLights = FindObjectsOfType<TrafficLightsController>().ToList();
+
+        foreach (var trafficLight in AllTrafficLights) // Bütün ýþýklar burada olmalý
+        {
+            if (trafficLight.YayaLights.Contains(this))
+            {
+                Debug.Log($"{trafficLight.name} bu yayaya baðlý. RedCircle açýlýyor.");
+                trafficLight.RedCircleOpen();
+            }
+            else
+            {
+                trafficLight.RedCircleClose();
+                trafficLight.CurrentSelected.color = trafficLight.OriginalColor;
+            }
+        }
+        //  CurrentSelected.SetActive(true);
     }
 
 

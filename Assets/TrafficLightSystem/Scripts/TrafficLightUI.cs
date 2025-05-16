@@ -36,20 +36,7 @@ public class TrafficLightUI : MonoBehaviour
     private void OnTargetYayaChanged()
     {
         Debug.Log("Yeni yaya seçildi. Tüm ışıklar taranıyor.");
-        var AllTrafficLights = FindObjectsOfType<TrafficLightsController>().ToList();
-
-        foreach (var trafficLight in AllTrafficLights) // Bütün ışıklar burada olmalı
-        {
-            if (trafficLight.YayaLights.Contains(TargetYaya))
-            {
-                Debug.Log($"{trafficLight.name} bu yayaya bağlı. RedCircle açılıyor.");
-                trafficLight.RedCircleOpen();
-            }
-            else
-            {
-                trafficLight.RedCircleClose();
-            }
-        }
+       
     }
     public void ConnectYayaToSelectedLight()
     {
@@ -66,12 +53,8 @@ public class TrafficLightUI : MonoBehaviour
     private void OnTargetLightChanged()
     {
         if (_targetLight == null) return;
-        TrafficSystemManager.Instance.RefreshReferences();
-        foreach (var light in TrafficSystemManager.Instance.AllTrafficLights)
-        {
-            light.CurrentSelected.color = light.OriginalColor;
-        }
-        TargetLight.CurrentSelected.color = TargetLight.MyBlue;
+        
+        SingleLightID.text = "Işık ID:  " + TargetLight.gameObject.name;
         if (TargetLight.IsFirstTimeClicked())
         {
             _targetLight.SetFirstTimeClicked(false);
@@ -277,6 +260,7 @@ public class TrafficLightUI : MonoBehaviour
     public Button applyButton;
     public Button emergencyButton;
     public Button RemoveFromGroup;
+    public TextMeshProUGUI SingleLightID;
 
     [Header("Night UI Elements")]
     public TMP_Dropdown nightDropDown;
@@ -293,10 +277,11 @@ public class TrafficLightUI : MonoBehaviour
     public TrafficGroupUIManager trafficGroupUIManager;
     public Button deleteGroupButton;
     public TextMeshProUGUI DeleteConfirmDialog;
-
+    public TMP_Dropdown groupLights;
     private int timeValue = 0;
     private bool isNightTime = false, a = false;
     private bool isDisable = false;
+    public TMP_Dropdown GroupLightsDropdown;
     #endregion
 
     #region Monobehavior Funcs
@@ -315,7 +300,7 @@ public class TrafficLightUI : MonoBehaviour
         PLSpawnerButton.onClick.AddListener(StartPLSpawn);
         groupDropdown.onValueChanged.AddListener(OnGroupSelected);
         groupNameInput.onEndEdit.AddListener(OnGroupNameChanged);
-         
+        
     }
     private void Update()
     {
@@ -364,7 +349,10 @@ public class TrafficLightUI : MonoBehaviour
         CanvasTrafficLightSingle.SetActive(false);
         trafficGroupUIManager.UI.SetActive(false);
     }
-
+    public string ShowID()
+    {
+        return TargetLight.gameObject.name;
+    }
     public void SetIsAutoDropdownNight(int a)
     {
         if (a == 3)
@@ -410,7 +398,8 @@ public class TrafficLightUI : MonoBehaviour
         stateDropdown.value = 8;
         stateDropdown.RefreshShownValue();
         SetIsAutoDropdown(8);
-        if(!TargetLight)
+        
+        if (!TargetLight)
             return;
         if (intersectionController.IsLightInAnyGroup(TargetLight))
         {
@@ -694,11 +683,16 @@ public class TrafficLightUI : MonoBehaviour
         if (TargetLight)
         {
             trafficGroupUIManager.IsLightInAnyIntersectionRemoveLightFromIntersections(TargetLight);
+            foreach (var YayaLight in TargetLight.YayaLights)
+            {
+                YayaLight.OnTargetDestroyed();
+                YayaLight.targetLight = null;
+            } 
             Destroy(TargetLight.transform.parent.gameObject);
             TargetLight = null;
-            DebugText.text = "Seçili Işık Silindi";
+           // DebugText.text = "Seçili Işık Silindi";
             CloseUI();
-            Invoke(nameof(RemoveDebugText), 3);
+           // Invoke(nameof(RemoveDebugText), 3);
 
         }
         else
@@ -750,6 +744,8 @@ public class TrafficLightUI : MonoBehaviour
         {
             groupNameInput.text = intersectionController.groups[index].groupName;
         }
+        intersectionController.GroupLights = GroupLightsDropdown;
+        intersectionController.SetupDropdown(index);
     }
     void OnGroupNameChanged(string newName)
     {
@@ -935,6 +931,19 @@ public class TrafficLightUI : MonoBehaviour
         TargetYaya.ChangeState();
         // Güncellenmiş BindingType için gerekli işlemleri yap
         Debug.Log($"Binding Type changed to: {TargetYaya.BindingType}");
+    }
+    public void OnYayalightSpawned()
+    {
+        Invoke(nameof(Yayaspawncooldowner),0.01f);
+    }
+    void Yayaspawncooldowner()
+    {
+        ApplySelectedState();
+
+        Debug.Log("YayaSpawnlandı");
+
+       
+
     }
 
     public void OnYayaLightEditEnd()
