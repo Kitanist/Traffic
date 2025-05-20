@@ -608,9 +608,11 @@ public class TrafficLightUI : MonoBehaviour
     }
     public void AddTargetToSelectedGroup()
     {
+
         if (intersectionController == null || TargetLight == null) return;
         int selectedIndex = groupDropdown.value;
         if (selectedIndex < 0 || selectedIndex >= intersectionController.groups.Count) return;
+        TargetLight.gameObject.transform.parent.SetParent(intersectionController.gameObject.transform);
 
         TrafficLightGroup selectedGroup = intersectionController.groups[selectedIndex];
         if (!selectedGroup.lights.Contains(TargetLight))
@@ -800,15 +802,7 @@ public class TrafficLightUI : MonoBehaviour
         intersectionController.groups.Add(newGroup);
         Debug.Log($"Yeni grup oluşturuldu: {newGroup.groupName}");
     }
-    public void AddTargetLightToGroup(TrafficLightGroup group)
-    {
-        if (TargetLight == null || group == null) return;
-        if (!group.lights.Contains(TargetLight))
-        {
-            group.lights.Add(TargetLight);
-            Debug.Log($"{TargetLight.name} added to {group.groupName}");
-        }
-    }
+   
     public void DeleteSelectedGroup()
     {
         int index = groupDropdown.value;

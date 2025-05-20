@@ -14,15 +14,22 @@ public class IntersectionController : MonoBehaviour
     [Header("Intersection Mode")]
     public IntersectionMode mode;
     public GameObject CurrentSelected;
-    public TMP_Dropdown GroupLights; 
+    public TMP_Dropdown GroupLights;
+    public int intersectionID =-1;
+    public static int IntersectionIDValue;
 
     [Header("Custom Order (Used only if mode = Custom)")]
     public List<TrafficLightGroup> customOrder = new List<TrafficLightGroup>();
 
     private void Start()
     {
-        StartCoroutine(StartCycleSequence());
-        CurrentSelected.SetActive(false);
+        if (intersectionID == -1)
+        {
+            IntersectionIDValue++;
+            intersectionID = IntersectionIDValue;
+        }
+       // StartCoroutine(StartCycleSequence());  aç bunu
+       // CurrentSelected.SetActive(false);
     }
     private void Awake()
     {
@@ -151,8 +158,18 @@ public class IntersectionController : MonoBehaviour
         TrafficUIManager.GetComponent<TrafficLightUI>().intersectionController = this;
         TrafficUIManager.GetComponent<TrafficLightUI>().IntersectionName.text = IntersectionName;
         TrafficUIManager.GetComponent<TrafficLightUI>().SetupGroupDropdown();
-        CurrentSelected.SetActive(true);
-       // Debug.Log("Selected");
+        if (CurrentSelected !=null)
+        {
+            CurrentSelected.SetActive(true);
+
+        }
+        else
+        {
+            CurrentSelected = transform.GetChild(0).transform.GetChild(0).transform.GetChild(1).gameObject;
+            CurrentSelected.SetActive(true);
+
+        }
+        // Debug.Log("Selected");
     }
     public void SetupDropdown(int index)
     {
@@ -181,6 +198,42 @@ public class IntersectionController : MonoBehaviour
         Debug.Log("Seçilen grup: " + selectedGroup.groupName);
         Debug.Log("Bu gruptaki ışık sayısı: " + selectedGroup.lights.Count);
     }
+    public List<TrafficLightGroupData> GetSavableGroups()
+    {
+        return groups.Select(group => new TrafficLightGroupData
+        {
+            groupName = group.groupName,
+            lightNames = group.lights.Select(light => light.name).ToList()
+        }).ToList();
+    }
+    public void OnSaveIntersection()
+    {
+        ES3.Save($"intersectionGroups{intersectionID}", GetSavableGroups());
+    }
+    public void OnLoadIntersection()
+    {
+        List<TrafficLightGroupData> loadedGroups = ES3.Load<List<TrafficLightGroupData>>($"intersectionGroups{intersectionID}");
+        foreach (var groupData in loadedGroups)
+        {
+            var newGroup = new TrafficLightGroup();
+            newGroup.groupName = groupData.groupName;
+            newGroup.lights = new List<TrafficLightsController>();
+
+            foreach (var name in groupData.lightNames)
+            {
+                var obj = GameObject.Find(name);
+                if (obj != null)
+                {
+                    var light = obj.GetComponent<TrafficLightsController>();
+                    if (light != null)
+                        newGroup.lights.Add(light);
+                }
+            }
+
+            groups.Add(newGroup);
+        }
+
+    }
 }
 [System.Serializable]
 public class TrafficLightGroup
@@ -188,4 +241,11 @@ public class TrafficLightGroup
     public string groupName;
     public List<TrafficLightsController> lights;
 }
+[System.Serializable]
+public class TrafficLightGroupData
+{
+    public string groupName;
+    public List<string> lightNames; // light GameObject isimleri ya da benzersiz ID’ler
+}
+
 

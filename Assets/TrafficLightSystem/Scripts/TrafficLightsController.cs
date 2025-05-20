@@ -26,17 +26,28 @@ public class TrafficLightsController : MonoBehaviour
     private Coroutine stateRoutine;
     private bool isManualOverride = false, isNight, isFirstTimeClicked = true;
     private Coroutine flashingRoutine;
-    public TrafficLightState CurrentState => currentState;
-    public NightModeState CurrentNightState => currentNightState;
+    public TrafficLightState CurrentState
+    {
+        get => currentState;
+        set => currentState = value;
+    }
+
+    public NightModeState CurrentNightState
+    {
+        get => currentNightState;
+        set => currentNightState = value;
+    }
+
     public GameEvent OnLightConnectEnd;
 
     private void Start()
     {
+        Invoke(nameof(LoadedStart),0.1f);
+    }
+    void LoadedStart()
+    {
         ApplyVisuals();
-        //   StartCycle();
         RedCircleClose();
-       // OriginalColor = CurrentSelected.color;
-
     }
     public void SelectLight()
     {
@@ -433,10 +444,27 @@ public class TrafficLightsController : MonoBehaviour
     }
     private void ApplyVisuals()
     {
+        if (redLight!=null)
+        {
+            redLight.SetActive(false);
+            greenLight.SetActive(false);
+            yellowLight.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("Işıklarım nerde lan");
 
-        redLight.SetActive(false);
-        greenLight.SetActive(false);
-        yellowLight.SetActive(false);
+            redLight = transform.parent.GetChild(3).gameObject;
+            greenLight = transform.parent.GetChild(2).gameObject;
+            yellowLight = transform.parent.GetChild(4).gameObject;
+            RemainingTime = transform.parent.GetChild(1).transform.GetChild(0).transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>();
+            CurrentSelected = transform.parent.GetChild(1).transform.GetChild(0).GetComponent<Image>();
+            redLight.SetActive(false);
+            greenLight.SetActive(false);
+            yellowLight.SetActive(false);
+            Debug.LogError("Sakin ol abi atadım ışıkları hatta sana benden kıyak diğer referansları da atadım (GPT değil ben yazdım bunu)");
+        }
+       
         SetYayas();
         if (greenYaya)
         {

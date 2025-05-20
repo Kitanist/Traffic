@@ -17,6 +17,8 @@ public class BuildManager : MonoBehaviour
     public GameEvent OnLightPlaced;
     public GameEvent OnIntersectionPlaced;
 
+    public GameObject ParentGameObject,IntersectionFreeLights;
+
     private GameObject currentPrefabToPlace;
     private GameObject ghostObject;
     private bool isPlacing = false;
@@ -57,7 +59,8 @@ public class BuildManager : MonoBehaviour
                 
                 if (currentPrefabToPlace == buildPrefabs[1])
                 {
-                  
+                a.transform.SetParent(ParentGameObject.transform);
+
                     if (!TGUIManager.Intersections.Contains(a))
                     {
                         TGUIManager.Intersections.Add(a);
@@ -73,6 +76,8 @@ public class BuildManager : MonoBehaviour
                 else
                 {
                     a.transform.GetChild(0).name = Random.Range(10000,100000).ToString();
+                    a.transform.SetParent(IntersectionFreeLights.transform);
+
                     OnLightPlaced.Raise();
                     
 

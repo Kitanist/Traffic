@@ -57,6 +57,8 @@ MonoBehaviour:
   IntersectionName: 
   mode: 0
   CurrentSelected: {fileID: 5124863300482557361}
+  GroupLights: {fileID: 0}
+  intersectionID: -1
   customOrder: []
 --- !u!23 &6041374193780508655
 MeshRenderer:
@@ -445,7 +447,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7369569264097813908
 RectTransform:
   m_ObjectHideFlags: 0
