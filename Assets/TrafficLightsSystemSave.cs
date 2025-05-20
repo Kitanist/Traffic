@@ -12,13 +12,15 @@ public class TrafficLightsSystemSave : MonoBehaviour
     [Header("Prefabs")]
     public GameObject ıntersection;
     public GameObject Light;
-
+    public GameObject YayaLight;
 
     public List<IntersectionController> ıntersectionControllers;
     public List<Transform> ıntersectionTransforms;
     public List<TrafficLightsController> lightsControllers;
     public List<Transform> lightTransforms;
-    public int intersectionCount, LightCount;
+    public List<YayaController> yayaControllers;
+    public List<Transform> YayaTransforms;
+    public int intersectionCount, LightCount,YayaLightCount;
 
     [Header("Dependicies")]
     public TrafficGroupUIManager TGUIManager;
@@ -43,10 +45,13 @@ public class TrafficLightsSystemSave : MonoBehaviour
         TrafficSystemManager.Instance.RefreshReferences();
         ıntersectionControllers =  TrafficSystemManager.Instance.AllIntersections;
         lightsControllers = TrafficSystemManager.Instance.AllTrafficLights;
+        yayaControllers = TrafficSystemManager.Instance.AllYayaLights;
         intersectionCount = ıntersectionControllers.Count;
         LightCount = lightsControllers.Count;
+        YayaLightCount = yayaControllers.Count;
         ES3.Save("intersectionCount", intersectionCount);
         ES3.Save("LightCount", LightCount);
+        ES3.Save("YayaLightCount", YayaLightCount);
         int a = 0;
         foreach (var item in ıntersectionControllers)
         {
@@ -67,7 +72,6 @@ public class TrafficLightsSystemSave : MonoBehaviour
             }
             ıntersectionTransforms.Add(item.gameObject.transform);
             a++;
-
         }
         a = 0;
         
@@ -78,9 +82,16 @@ public class TrafficLightsSystemSave : MonoBehaviour
             lightTransforms.Add(item.gameObject.transform.parent);
             a++;
         }
+        a = 0;
+        foreach (var item in yayaControllers)
+        {
+            ES3.Save($"YayaLight{a}",item);
+            YayaTransforms.Add(item.gameObject.transform);
+            a++;
+        }
         ES3.Save("lightTransforms", lightTransforms);
         ES3.Save("ıntersectionTransforms", ıntersectionTransforms);// Pozisyon bilgileri 
-
+        ES3.Save("YayaTransforms", YayaTransforms);
         Debug.LogError("SAVE");
     }
 
@@ -88,8 +99,11 @@ public class TrafficLightsSystemSave : MonoBehaviour
     {
         intersectionCount=ES3.Load("intersectionCount", intersectionCount);
         LightCount=ES3.Load("LightCount", LightCount);
+        YayaLightCount = ES3.Load("YayaLightCount", YayaLightCount);
         ıntersectionTransforms = ES3.Load("ıntersectionTransforms", ıntersectionTransforms);
         lightTransforms = ES3.Load("lightTransforms", lightTransforms);
+        YayaTransforms = ES3.Load("YayaTransforms", YayaTransforms);
+
         Debug.LogError("Load");
         for (int i = 0; i < LightCount; i++)// Işık Build
         {
@@ -121,7 +135,6 @@ public class TrafficLightsSystemSave : MonoBehaviour
                         Debug.Log(key);
                         Debug.LogError("Çalışmadı");
                     }
-
                 }
                 j++;
             }
@@ -136,53 +149,12 @@ public class TrafficLightsSystemSave : MonoBehaviour
             {
                 renderer.material = TransparentMaterial;
             }
-
-
-
         }
-       
-
-
-
-
-
-        // Eski Sistem
-
-        // foreach (var item in ıntersectionControllers)
-        // {
-        //     GameObject a = Instantiate(ıntersection,SaveObject.transform);
-        //      a.transform.position = ıntersectionTransforms[i].position; // Pozisyon bilgisi Aktarılıyor
-        //      var b = a.GetComponent<IntersectionController>();
-        //      b.name = item.name;
-        //      b.greenDuration = item.greenDuration;
-        //      b.groups = item.groups;
-        //      b.intersectionID = item.intersectionID;
-        //      b.IntersectionName = item.IntersectionName;
-        //      b.mode = item.mode;
-        //      b.redBuffer = item.redBuffer;
-        //      b.yellowDuration = item.yellowDuration;
-        //      b.groups = item.groups;
-        //      i++;
-        //      
-        // } // Script Bilgilerini aktarıyorum
-        // i= 0;    
-        // foreach (var item in lightsControllers)
-        //  {
-        //      GameObject a = Instantiate(Light,SaveObject.transform);
-        //      a.transform.position = lightTransforms[i].position;
-        //      var c = a.GetComponentInChildren<TrafficLightsController>();
-        //      c.name = item.name;
-        //      c.greenDuration = item.greenDuration;
-        //      //State i yazdır;
-        //      c.isAutoMode = item.isAutoMode;
-        //      c.MyBlue = item.MyBlue;
-        //      c.preHoldDuration = item.preHoldDuration;
-        //      c.redDuration = item.redDuration;
-        //      c.yellowDuration = item.yellowDuration;
-        //      c.CurrentState = item.CurrentState;
-        //      c.CurrentNightState = item.CurrentNightState;
-        //
-        //
-        //  }
+        for (int i = 0; i < YayaLightCount; i++)
+        {
+            var a = Instantiate(YayaLight,SaveObject2.transform);
+            ES3.LoadInto($"YayaLight{i}",a.GetComponent<YayaController>());
+            a.transform.position = YayaTransforms[i].transform.position;
+        }
     }
 }

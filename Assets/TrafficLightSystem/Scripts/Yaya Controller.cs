@@ -38,7 +38,17 @@ public class YayaController : MonoBehaviour
 
     private void Start()
     {
-        OriginalColor = CurrentSelected.color;
+        if (CurrentSelected!=null)
+        {
+            OriginalColor = CurrentSelected.color;
+        }
+        else
+        {
+            CurrentSelected = transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent<Image>();
+            OriginalColor = CurrentSelected.color;
+
+        }
+
         //YayaStateDropdown.onValueChanged.AddListener(SetState);
         TLUI = FindObjectOfType<TrafficLightUI>();
         

@@ -464,7 +464,7 @@ public class TrafficLightsController : MonoBehaviour
             yellowLight.SetActive(false);
             Debug.LogError("Sakin ol abi atadım ışıkları hatta sana benden kıyak diğer referansları da atadım (GPT değil ben yazdım bunu)");
         }
-       
+        // Burada Yaya Referansını vericeksin işlem tamam
         SetYayas();
         if (greenYaya)
         {
