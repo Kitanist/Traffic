@@ -64,21 +64,24 @@ public class TrafficLightsController : MonoBehaviour
         CurrentSelected.color = MyBlue;
         if (!TrafficUIManager.GetComponent<TrafficLightUI>().intersectionController)
         {
+            Debug.Log("intersectioncontrolleryokken ne soruyon birazder");
+
             TrafficUIManager.GetComponent<TrafficLightUI>().RemoveFromGroup.interactable = false;
             return;
         }
-        if (TrafficUIManager.GetComponent<TrafficLightUI>().intersectionController.IsLightInAnyGroup(this))
+        if (TrafficUIManager.GetComponent<TrafficGroupUIManager>().IsLightInAnyIntersection(this))
         {
             TrafficUIManager.GetComponent<TrafficLightUI>().RemoveFromGroup.interactable = true;
             TrafficUIManager.GetComponent<TrafficLightUI>().stateDropdown.interactable = false;
             TrafficUIManager.GetComponent<TrafficLightUI>().nightDropDown.interactable = false;
-
+            Debug.Log("Evet Gruptayım");
 
 
         }
         else
         {
             TrafficUIManager.GetComponent<TrafficLightUI>().RemoveFromGroup.interactable = false;
+            Debug.Log("yo Grupt deilim");
 
             TrafficUIManager.GetComponent<TrafficLightUI>().stateDropdown.interactable = true;
             TrafficUIManager.GetComponent<TrafficLightUI>().nightDropDown.interactable = true;

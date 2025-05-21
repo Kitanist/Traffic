@@ -17,7 +17,7 @@ public class IntersectionController : MonoBehaviour
     public TMP_Dropdown GroupLights;
     public int intersectionID =-1;
     public static int IntersectionIDValue;
-
+    
     [Header("Custom Order (Used only if mode = Custom)")]
     public List<TrafficLightGroup> customOrder = new List<TrafficLightGroup>();
 
@@ -28,7 +28,7 @@ public class IntersectionController : MonoBehaviour
             IntersectionIDValue++;
             intersectionID = IntersectionIDValue;
         }
-       // StartCoroutine(StartCycleSequence());  aç bunu
+        StartCoroutine(StartCycleSequence());  
        // CurrentSelected.SetActive(false);
     }
     private void Awake()

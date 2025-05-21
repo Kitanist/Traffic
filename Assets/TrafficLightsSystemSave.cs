@@ -28,7 +28,9 @@ public class TrafficLightsSystemSave : MonoBehaviour
 
     [Header("GameEvents")]
     public GameEvent OnLightPlaced;
+    public GameEvent OnTrafficEnable;// geçici duruma göre silebilirsiniz
 
+    private string saveDirectory => Application.persistentDataPath + "/TrafficSaves";
 
     public Material  TransparentMaterial;
     void Awake()
@@ -110,7 +112,9 @@ public class TrafficLightsSystemSave : MonoBehaviour
             var a = Instantiate(Light, SaveObject2.transform);
             ES3.LoadInto($"Light {i}", a.GetComponentInChildren<TrafficLightsController>());
             a.transform.position = lightTransforms[i].transform.position;
+            a.transform.rotation = lightTransforms[i].transform.rotation;
             a.transform.GetChild(0).name = ES3.Load<string>($"LightName{i}");
+            a.GetComponentInChildren<TrafficLightsController>().SetFirstTimeClicked(false);
             OnLightPlaced.Raise();
         }
         for (int i = 0; i < intersectionCount; i++)// Kavşak Build
@@ -155,6 +159,9 @@ public class TrafficLightsSystemSave : MonoBehaviour
             var a = Instantiate(YayaLight,SaveObject2.transform);
             ES3.LoadInto($"YayaLight{i}",a.GetComponent<YayaController>());
             a.transform.position = YayaTransforms[i].transform.position;
+            a.transform.rotation = YayaTransforms[i].transform.rotation;
         }
+        OnTrafficEnable.Raise();
+
     }
 }

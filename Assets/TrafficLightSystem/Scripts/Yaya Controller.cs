@@ -46,7 +46,16 @@ public class YayaController : MonoBehaviour
         {
             CurrentSelected = transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent<Image>();
             OriginalColor = CurrentSelected.color;
+            RedLight = transform.GetChild(1).gameObject;
+            GreenLight = transform.GetChild(2).gameObject;
+            for (int i = targetLight.YayaLights.Count - 1; i >= 0; i--)
+            {
+                targetLight.YayaLights.RemoveAll(item => item == null);
+                if (!targetLight.YayaLights.Contains(this))
+                    targetLight.YayaLights.Add(this);
 
+            }
+            Debug.LogError("YayaAtamalarýYapýldý");
         }
 
         //YayaStateDropdown.onValueChanged.AddListener(SetState);
@@ -275,7 +284,7 @@ public class YayaController : MonoBehaviour
                     StopCoroutine(flashingCoroutine);
                 RedLight.SetActive(false);
                 GreenLight.SetActive(false);
-                Debug.Log("Selected");
+               // Debug.Log("Selected");
 
                 if (!IsNight)
                 {

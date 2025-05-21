@@ -195,6 +195,22 @@ public class TrafficGroupUIManager : MonoBehaviour // Mevcut kavþaklarý tutmak v
 
         }
     }
+    public bool IsLightInAnyIntersection(TrafficLightsController targetLight)
+    {
+        foreach (var kavsak in Intersections)
+        {
+            if (kavsak.GetComponent<IntersectionController>().IsLightInAnyGroup(targetLight))
+            {
+               return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+        return false;
+    }
     public void OpenUI()
     {
         UI.SetActive(true);
