@@ -46,7 +46,19 @@ public class TrafficLightsController : MonoBehaviour
     }
     void LoadedStart()
     {
-        ApplyVisuals();
+        
+        
+        if (!isManualOverride && isAutoMode)
+        {
+            StartCycle();
+            Debug.Log("a");
+        }
+        else
+        {
+            Debug.Log("b");
+
+            ApplyVisuals();
+        }
         RedCircleClose();
     }
     public void SelectLight()
@@ -60,6 +72,10 @@ public class TrafficLightsController : MonoBehaviour
         {
             light.CurrentSelected.color = light.OriginalColor;
             light.RedCircleClose();
+        }
+        foreach (var item in TrafficSystemManager.Instance.AllYayaLights)
+        {
+            item.CurrentSelected.color = item.OriginalColor;
         }
         CurrentSelected.color = MyBlue;
         if (!TrafficUIManager.GetComponent<TrafficLightUI>().intersectionController)
@@ -91,7 +107,7 @@ public class TrafficLightsController : MonoBehaviour
     }
     public void StartCycle()
     {
-        isManualOverride = false;
+        isManualOverride = true;
         if (stateRoutine != null) StopCoroutine(stateRoutine);
         stateRoutine = StartCoroutine(LightCycleRoutine());
     }
@@ -605,6 +621,9 @@ public class TrafficLightsController : MonoBehaviour
                         flashingRoutine = StartCoroutine(FlashRoutine(yellowLight));
                         SetYayas();
                         return;
+                    case NightModeState.Off:
+                        SetYayas();
+                        return;
                     default:
                         break;
                 }
@@ -625,7 +644,7 @@ public class TrafficLightsController : MonoBehaviour
     }
     public void RedCircleClose()
     {
-        CurrentSelected.color = OriginalColor;
+       // CurrentSelected.color = OriginalColor;
     }
     public void SelectConnectYayaTarget()
     {

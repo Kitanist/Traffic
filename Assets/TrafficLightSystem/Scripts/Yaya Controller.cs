@@ -35,6 +35,9 @@ public class YayaController : MonoBehaviour
     public Color OriginalColor;
 
     private Coroutine flashingCoroutine;
+    private bool yayaStateChanged = false;
+    private int selectedYayaState;
+
 
     private void Start()
     {
@@ -131,37 +134,60 @@ public class YayaController : MonoBehaviour
 
     private void UpdateDropdown()
     {
-        // Seçilen YayaController'a göre dropdown'larý güncelliyoruz
         if (TLUI.TargetYaya != null)
         {
-            // YayaState güncelleme
+            if (TLUI.YayaApplyChangesButton != null)
+                TLUI.YayaApplyChangesButton.interactable = false;
+
             if (YayaStateDropdown != null)
             {
-                Debug.Log($"Yaya Dropdown guncellendi. Deðer önceki {YayaStateDropdown.value}");
-                if (YayaStateDropdown.value != (int)TLUI.TargetYaya.YayaState)
+                Debug.Log($"Yaya Dropdown güncellendi. Deðer önceki {YayaStateDropdown.value}");
+
+                int currentState = (int)TLUI.TargetYaya.YayaState;
+                YayaStateDropdown.onValueChanged.RemoveAllListeners(); // Event stack bozulmasýn
+
+                if (YayaStateDropdown.value != currentState)
                 {
-                    YayaStateDropdown.value = (int)TLUI.TargetYaya.YayaState;
+                    YayaStateDropdown.value = currentState;
                     YayaStateDropdown.RefreshShownValue();
-                    TLUI.TargetYaya.SetState((int)TLUI.TargetYaya.YayaState);
-                    Debug.Log($"Yaya Dropdown guncellendi. Deðer sonraki {YayaStateDropdown.value}");
                 }
-                 else 
-                    Debug.Log($"Yaya Dropdown guncellenmedi deðer ayný");
-               
 
-
-                   
+                // Apply'le çalýþacaðýmýz için direkt deðiþtirmiyoruz
+                YayaStateDropdown.onValueChanged.AddListener((val) =>
+                {
+                    yayaStateChanged = true;
+                    selectedYayaState = val;
+                    Debug.Log($"Yaya state deðiþtirildi ama henüz apply edilmedi: {val}");
+                    if (TLUI.YayaApplyChangesButton != null)
+                        TLUI.YayaApplyChangesButton.interactable = true;
+                });
             }
 
-            // YayaBindingType güncelleme
             if (YayaBindingTypeDropdown != null)
             {
-                Debug.Log($"Yaya Binding Type Dropdown guncellendi. Deðer önceki {YayaBindingTypeDropdown.value}");
+                Debug.Log($"Yaya Binding Type Dropdown güncellendi. Deðer önceki {YayaBindingTypeDropdown.value}");
                 YayaBindingTypeDropdown.value = (int)TLUI.TargetYaya.BindingType;
                 YayaBindingTypeDropdown.RefreshShownValue();
-                Debug.Log($"Yaya Binding Type Dropdown guncellendi. Deðer sonraki {YayaBindingTypeDropdown.value}");
+                Debug.Log($"Yaya Binding Type Dropdown güncellendi. Deðer sonraki {YayaBindingTypeDropdown.value}");
             }
         }
+    }
+
+    public void ApplyYayaChanges()
+    {
+        if (TLUI.TargetYaya == null) return;
+
+        if (yayaStateChanged)
+        {
+            TLUI.TargetYaya.SetState(selectedYayaState);
+            yayaStateChanged = false;
+            Debug.Log($"Yaya state apply edildi: {selectedYayaState}");
+
+            if (TLUI.YayaApplyChangesButton != null)
+                TLUI.YayaApplyChangesButton.interactable = false;
+        }
+
+        // Eðer ileride BindingType için de Apply istenirse buraya ekleyebiliriz
     }
 
 
@@ -371,6 +397,11 @@ public class YayaController : MonoBehaviour
                         RedLight.SetActive(false);
                         GreenLight.SetActive(false);
                     }
+                    else if (targetLight.CurrentNightState == NightModeState.Off)
+                    {
+                        RedLight.SetActive(false);
+                        GreenLight.SetActive(false);
+                    }
                 }
                 
                 break;
@@ -403,6 +434,7 @@ public class YayaController : MonoBehaviour
 
             case YayaState.IsAuto:
                 // Otomatik kontrol targetLight üzerinden yapýlabilir
+                ChangeState();
                 DisableFlashing();
 
                 break;
@@ -506,7 +538,12 @@ public class YayaController : MonoBehaviour
                 trafficLight.CurrentSelected.color = trafficLight.OriginalColor;
             }
         }
-        //  CurrentSelected.SetActive(true);
+        TrafficSystemManager.Instance.RefreshReferences();
+        foreach (var YayaLight in TrafficSystemManager.Instance.AllYayaLights)
+        {
+            YayaLight.CurrentSelected.color = OriginalColor;
+        }
+          CurrentSelected.color = targetLight.MyBlue;
     }
 
 

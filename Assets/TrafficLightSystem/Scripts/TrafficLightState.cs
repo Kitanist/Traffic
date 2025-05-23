@@ -25,6 +25,7 @@ public enum NightModeState
     FlashingYellow1s,
     FlashingRed2s,
     FlashingYellow2s,
+    Off
 }
 public enum YayaState
 {

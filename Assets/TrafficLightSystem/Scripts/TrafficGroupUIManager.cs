@@ -8,9 +8,9 @@ public class TrafficGroupUIManager : MonoBehaviour // Mevcut kavþaklarý tutmak v
     public GameObject slotPrefab, slotEmpty,UI;
     public List<GameObject> Intersections = new();
     public Transform slotContainer,SlotParent;
-    public TMP_InputField IntersectionNameInputfield;
+    public TMP_InputField IntersectionNameInputfield,IntersectionGreenInputField,IntersectionRedInputField,IntersectionYellowInputField;
     public TMP_Dropdown IntersectionsDropdown;
-    public TMP_InputField IntersectionUIInputfield;
+    public TMP_InputField IntersectionUIInputfield,IntersectionUýGreenInputfield, IntersectionUýYellowInputfield, IntersectionUýRedInputfield;
     public TrafficLightUI TLUI;
     private IntersectionController _controller;
     private List<Transform> dropZones = new();
@@ -38,9 +38,12 @@ public class TrafficGroupUIManager : MonoBehaviour // Mevcut kavþaklarý tutmak v
             PopulateDropdown();
         }
         IntersectionUIInputfield.onEndEdit.AddListener(ChangeName);
-       
+        IntersectionUýGreenInputfield.onEndEdit.AddListener(ChangeIntersectionGreenTime);
+        IntersectionUýYellowInputfield.onEndEdit.AddListener(ChangeIntersectionYellowTime);
+        IntersectionUýRedInputfield.onEndEdit.AddListener(ChangeIntersectionRedTime);
+
         //GenerateUI();  // Yakýnda yukardaki ve buna gerek olmucak 
-       
+
 
     }
     public void PopulateDropdown()
@@ -160,9 +163,31 @@ public class TrafficGroupUIManager : MonoBehaviour // Mevcut kavþaklarý tutmak v
        
        if (!a) 
         Controller.IntersectionName = IntersectionName;
-       // Debug.Log($"NewNameCreated {Controller.IntersectionName}");
+        Controller.greenDuration = int.Parse(IntersectionGreenInputField.text);
+        Controller.redBuffer = int.Parse(IntersectionRedInputField.text);
+        Controller.yellowDuration = int.Parse(IntersectionYellowInputField.text);
+        if (Controller.redBuffer<=0)
+        {
+            Controller.redBuffer = 1;
+        }
+        if (Controller.greenDuration <= 0)
+        {
+            Controller.greenDuration = 1;
+        }
+        if (Controller.yellowDuration <= 0)
+        {
+            Controller.yellowDuration = 1;
+        }
+        // Debug.Log($"NewNameCreated {Controller.IntersectionName}");
         TrafficUIManager.GetComponent<TrafficLightUI>().CreateIntersection(IntersectionName, Controller);
         PopulateDropdown();
+
+    }
+    public void UpdateInputfieldUI(string greenInput,string redInput,string yellowInput)
+    {
+        IntersectionUýGreenInputfield.text = greenInput;
+        IntersectionUýRedInputfield.text = redInput;
+        IntersectionUýYellowInputfield.text = yellowInput;
 
     }
     public void ChangeName(string b)
@@ -184,6 +209,18 @@ public class TrafficGroupUIManager : MonoBehaviour // Mevcut kavþaklarý tutmak v
          TLUI.CreateIntersection(b, Controller);
         PopulateDropdown();
     }
+    public void ChangeIntersectionRedTime(string a)
+    {
+        Controller.redBuffer = int.Parse(a);
+    }
+    public void ChangeIntersectionYellowTime(string a)
+    {
+        Controller.yellowDuration = int.Parse(a);
+    }
+    public void ChangeIntersectionGreenTime(string a)
+    {
+        Controller.greenDuration = int.Parse(a);
+    }
     public void IsLightInAnyIntersectionRemoveLightFromIntersections(TrafficLightsController targetLight)
     {
         foreach (var kavsak in Intersections)
@@ -203,10 +240,7 @@ public class TrafficGroupUIManager : MonoBehaviour // Mevcut kavþaklarý tutmak v
             {
                return true;
             }
-            else
-            {
-                return false;
-            }
+            
 
         }
         return false;

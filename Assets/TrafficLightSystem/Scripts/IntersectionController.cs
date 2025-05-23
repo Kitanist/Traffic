@@ -131,6 +131,8 @@ public class IntersectionController : MonoBehaviour
         {
             if (group.lights.Contains(targetLight))
             {
+                Debug.Log("Ben böyle ışık buldum kendimde");
+
                 return true;
             }
         }
@@ -138,10 +140,12 @@ public class IntersectionController : MonoBehaviour
         {
             if (group.lights.Contains(targetLight))
             {
+                Debug.Log("Ben böyle ışık buldum kendimde2");
+
                 return true;
             }
         }
-
+        Debug.Log("Ben böyle ışık bulamadım kendimde");
         return false;
     }
 
@@ -154,6 +158,8 @@ public class IntersectionController : MonoBehaviour
         }
         TrafficUIManager.GetComponent<TrafficGroupUIManager>().Controller = this;
         TrafficUIManager.GetComponent<TrafficGroupUIManager>().OpenUI();
+        TrafficUIManager.GetComponent<TrafficGroupUIManager>().UpdateInputfieldUI(greenDuration.ToString(),redBuffer.ToString(), yellowDuration.ToString());
+
 
         TrafficUIManager.GetComponent<TrafficLightUI>().intersectionController = this;
         TrafficUIManager.GetComponent<TrafficLightUI>().IntersectionName.text = IntersectionName;

@@ -222,6 +222,10 @@ public class TrafficLightUI : MonoBehaviour
                     nightDropDown.value = 7;
 
                     break;
+                case NightModeState.Off:
+                    SetIsAutoDropdownNight(8);
+                    nightDropDown.value = 8;
+                    break;
                 default:
                     break;
             }
@@ -249,6 +253,7 @@ public class TrafficLightUI : MonoBehaviour
     public PedestrianLightSpawner PLSpawner;
     public Button PLSpawnerButton;
     public TMP_Dropdown YayaStateDropdown,YayaBindingTypeDropdown;
+    public Button YayaApplyChangesButton;
 
     [Header("Single UI Elements")]
     public GameObject CanvasTrafficLightSingle;
@@ -300,7 +305,7 @@ public class TrafficLightUI : MonoBehaviour
         PLSpawnerButton.onClick.AddListener(StartPLSpawn);
         groupDropdown.onValueChanged.AddListener(OnGroupSelected);
         groupNameInput.onEndEdit.AddListener(OnGroupNameChanged);
-        
+        YayaApplyChangesButton.onClick.AddListener(ApplyYayaChanges);
     }
     private void Update()
     {
@@ -390,7 +395,7 @@ public class TrafficLightUI : MonoBehaviour
         nightDropDown.ClearOptions();
         nightDropDown.AddOptions(new System.Collections.Generic.List<string>
         {
-            "Red", "Yellow", "Green", "IsAuto","Disable","FlashingRed1s", "FlashingYellow1s","FlashingRed2s","FlashingYellow2s",
+            "Red", "Yellow", "Green", "IsAuto","Disable","FlashingRed1s", "FlashingYellow1s","FlashingRed2s","FlashingYellow2s","Off",
         });
         nightDropDown.value = 4;
         nightDropDown.RefreshShownValue();
@@ -740,6 +745,7 @@ public class TrafficLightUI : MonoBehaviour
 
         
     }
+
     void OnGroupSelected(int index)
     {
         if (index >= 0 && index < intersectionController.groups.Count)
@@ -946,6 +952,20 @@ public class TrafficLightUI : MonoBehaviour
         foreach (var yaya in TrafficSystemManager.Instance.AllYayaLights)
         {
           //  yaya.CurrentSelected.SetActive(false);
+        }
+    }
+
+    public void ApplyYayaChanges()
+    {
+        TargetYaya.ApplyYayaChanges();
+    }
+    public void OnYayaLightSpawnedCloseAllCurrentSelected()
+    {
+        TrafficSystemManager.Instance.RefreshReferences();
+        var a = TrafficSystemManager.Instance.AllYayaLights;
+        foreach (var item in a)
+        {
+            item.CurrentSelected.color = item.OriginalColor;
         }
     }
     #endregion
